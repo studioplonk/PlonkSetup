@@ -1,0 +1,151 @@
+TITLE:: PlonkSetup
+summary:: Scaffolding structure to hold instrument definitions and other performance parts  
+categories:: Setup
+related:: Classes/PlonkInstallation, Classes/PlonkSoundSupport
+
+DESCRIPTION::
+A wrapper around a dictionary that allows to outline and run a complex set of sound definitions.
+All configuration and actual sound and interaction definitions should be in a set of files living in the project directory.
+There is a prototype directory in this quark's directory called code::protoSetup::.
+Feel free to copy it to a place of your choice and fill it with your beautiful code.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+Returns a new instance of code::PlonkSetup::.
+
+
+argument:: path 
+the path to all your beautiful sound definitions and related files. 
+Should also include a code::config.scd:: file with a dictionary (see examples below).
+argument:: projectName
+the name of your project. not super important but a should be a code::String:: or code::Symbol::.
+
+
+
+PRIVATE:: protoConfig
+
+
+INSTANCEMETHODS::
+PRIVATE:: pr_loadConfigFile, pr_runList, pr_prepareServerStartup, pr_doWhenBooted, pr_getSoundSupport, init
+
+METHOD:: startup
+Needs to be called to create everything.
+Loads the config file internally and starts the server.
+
+
+SUBSECTION:: Configuration
+
+
+METHOD:: loadConfig
+Manually (re-)load config file.
+argument:: force 
+Set to code::true:: to reload the config file.
+
+METHOD:: config
+Access config file.
+
+code::
+q.config; // if you haven't put anything into your config file, this looks empty.
+q.config.proto; // but has a proto dict with default values
+// you can get information out of it just as you'd with a normal event:
+q.config.sampleRate; // > 4800
+::
+
+SUBSECTION:: Introspection
+
+METHOD:: path
+the path to your setup.
+
+METHOD:: server
+the sound server.
+
+METHOD:: assetsDir
+the assets directory in which e.g. sound files are stored.
+
+METHOD:: projectName
+the name of the project
+
+
+SUBSECTION:: Sound
+
+METHOD:: sounds, soundHelpers
+Dictionaries holding sounds and sound helpers in the form of link::Classes/PlonkSoundSupport::.
+To create a new code::sound:: resp. code::soundHelper::, call this method and it will create a code::PlonkSoundSupport:: that you can populate.
+argument:: key
+
+
+METHOD:: stopAllSounds, playAllSounds
+Start/Stop playback of all sounds. 
+
+METHOD:: sync
+Sync the server. Only possible inside a link::Classes/Task:: or link::Classes/Routine::.
+
+METHOD:: startServer
+Manually start the server. 
+Called internally by code::startup::
+
+METHOD:: proxyspace
+a proxyspace to hold all code::NodeProxies:: for this setup
+
+
+SUBSECTION:: Logging
+
+METHOD:: log
+logging mechanism.
+
+argument:: who
+a symbol determining the category of the process to be logged.
+argument:: msg
+the message
+argument:: urgence
+if code::true::, message will be shown independant of the current verbosity level of the category.
+
+
+METHOD:: activateVerbose, deactivateVerbose
+(de)activate verbose levels.
+
+argument:: who
+a symbol determining which log messages should or should not be displayed.
+
+METHOD:: verbose
+argument:: who
+a symbol determining which log messages should or should not be displayed.
+argument:: level
+set to code::false:: to stop displaying methods
+
+
+METHOD:: verboseLevels
+an code::Array:: of all verbose code::Symbols::.
+
+
+METHOD:: systemName
+the system name as it is extracted from the system.
+
+
+SUBSECTION:: Prototyping
+
+METHOD:: dict
+an code::Event:: to possibly hold your prototyping elements.
+
+METHOD:: at
+return something from code::dict::
+argument:: selector 
+the key under which the element is stored
+
+METHOD:: put
+put something into code::dict::
+argument:: selector
+the key under which the element should be stored
+argument:: value
+the element to be stored
+
+
+
+
+EXAMPLES::
+
+code::
+_some_example_code_
+::

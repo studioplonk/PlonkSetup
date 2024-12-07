@@ -1,0 +1,10 @@
+(
+	\name: "PlonkSetup",
+	\path: "PlonkSetup",
+	\summary: "Run a performance or an installation",
+	\author: "Till Bovermann, Constantin Engelmann",
+	\organization: "Plonk",
+    \version: "0.2",
+    \url: "https://plonk.studio",
+	\dependencies: ["DayTimer"],
+)
