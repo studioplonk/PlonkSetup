@@ -1,7 +1,7 @@
-// this is the main entrance to a PlonkSetup. 
+// this is the main entrance to a PlonkSetup.
 // To start a new project, copy the whole directory and fill it with your content
 
-// this file is meant to be executed in one go, 
+// this file is meant to be executed in one go,
 // so either load it from your startup file or select all and execute.
 
 q = PlonkSetup(
@@ -23,7 +23,7 @@ here you have space to add test code, e.g.
 
 you can add your own messages by calling
 
-q.log(\name, "messagString"); // only displayed if q.activateVerbose(\name) 
+q.log(\name, "messagString"); // only displayed if q.activateVerbose(\name)
 q.log(\name, "messagString", true); // force display
 
 
@@ -33,7 +33,8 @@ or peek into the loaded config
 q.config; // looks empty
 q.config.proto; // but has a proto dict with default values
 // you can get information out of it just as you'd with the normal event:
-q.config.sampleRate; // > 4800
+q.config.serverLatency; // 0.2
+q.server.latency; // should be the same as q.config.serverLatency
 
 // variables are populated, e.g.
 q.systemName
@@ -41,5 +42,9 @@ q.systemName
 // theres a dict for prototyping
 q.dict; // put your stuff here
 
+// the directory in which assets (e.g. sounds) are expected
+q.assetsDir;
+// set it
+q.moon
 
 */

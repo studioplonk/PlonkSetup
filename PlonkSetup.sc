@@ -13,7 +13,7 @@ PlonkSetup {
     *new {|path, projectName|
         ^super.new.init(path, projectName);
     }
-    init {|argPath, argProjectName, argServer|        
+    init {|argPath, argProjectName, argServer|
         path = argPath;
 
         // require the project name to be a symbol
@@ -33,20 +33,10 @@ PlonkSetup {
     *protoConfig {
         ^(
             relAssetsDir: "_assets",
-            server: Server.default,
+			server: Server.default,
+			serverLatency: 0.2, // default
             beforeBoot: [],
-            afterBoot: [],
-            sampleRate: 48000,
-            blockSize: 64,
-            numBuffers: 1024,
-            // audioDevice_Linux: "", // not needed because we're running pipewire
-            audioDevice_OSX: "BlackHole 64ch",
-            numOutputBusChannels: 2,
-            numInputBusChannels: 2,
-            maxNodes: 1024 * 16,
-            memSize: 8192 * 64,
-            numWireBufs: 1024,
-            bindAddress: "0.0.0.0"
+            afterBoot: []
         );
     }
 
@@ -134,32 +124,51 @@ PlonkSetup {
         });
         ^inDict;
     }
+	pr_makeServerOptions {
+		var options = server.options;
+
+		// check if an audio device is requested by key and assign it to options.device
+		config.audioDevice.notNil.if{
+			var regexp = config.audioDevices[config.audioDevice];
+			options.device = ServerOptions.devices.detect{|name| regexp.matchRegexp(name)};
+		};
+
+		// assign all other options (possibly overriding previous assigned device)
+		config.serverOptions.postln;
+		config.serverOptions.keysValuesDo{|key, val|
+			options.perform(key.asSetter, val)
+		};
+
+		^options;
+	}
     pr_prepareServerStartup {
         server = config.server;
-        server.latency = config.latency;
-        server.options.numOutputBusChannels = config.numOutputBusChannels;
-        server.options.numInputBusChannels = config.numInputBusChannels;
-        server.options.maxNodes = config.maxNodes;
-        server.options.memSize = config.memSize;
-        server.options.numWireBufs = config.numWireBufs;
-        server.options.bindAddress = config.bindAddress;
-        server.options.sampleRate = config.sampleRate;
-        server.options.blockSize = config.blockSize;
-        server.options.numBuffers = config.numBuffers;
+		server.options = this.pr_makeServerOptions;
+		server.options.dump;
+		server.latency = config.serverLatency;
+		// server.options.numOutputBusChannels = config.numOutputBusChannels;
+		// server.options.numInputBusChannels = config.numInputBusChannels;
+		// server.options.maxNodes = config.maxNodes;
+		// server.options.memSize = config.memSize;
+		// server.options.numWireBufs = config.numWireBufs;
+		// server.options.bindAddress = config.bindAddress;
+		// server.options.sampleRate = config.sampleRate;
+		// server.options.blockSize = config.blockSize;
+		// server.options.numBuffers = config.numBuffers;
 
-    	Platform.case(
-            \osx,   {
-                // hide SuperCollider IDE
-                //unixCmd("osascript -e 'tell application \"Finder\"' -e 'set visible of process \"SuperCollider\" to false' -e 'end tell'”);
-                ServerOptions.outDevices.includesEqual(config.audioDevice_OSX).if({
-                    server.options.device = config.audioDevice_OSX;
-                    this.log(\config, "Using audio interface %".format(server.options.device));
-                }, {
-                    server.options.device = nil;
-                    this.log(\config, "Using default audio interface; change it via systems dialog or define preferred interface in the config file.");
-                    // "(Alt + click on loudspeaker symbol in the status bar)".postln;
-                });
-            },
+		// Platform.case(
+		// 	\osx,   {
+		// 		// hide SuperCollider IDE
+		// 		//unixCmd("osascript -e 'tell application \"Finder\"' -e 'set visible of process \"SuperCollider\" to false' -e 'end tell'”);
+		// 		ServerOptions.outDevices.includesEqual(config.audioDevice_OSX).if({
+		// 			server.options.device = config.audioDevice_OSX;
+		// 			this.log(\config, "Using audio interface %".format(server.options.device));
+		// 			}, {
+		// 				server.options.device = nil;
+		// 				this.log(\config, "Using default audio interface; change it via systems dialog or define preferred interface in the config file.");
+		// 				// "(Alt + click on loudspeaker symbol in the status bar)".postln;
+		// 		});
+		// 	},
             // not needed anymore since we're running pipewire
             // \linux,   {
             //     this.log(\startup, "Using audio interface %".format(config.audioDevice_Linux));
@@ -168,7 +177,7 @@ PlonkSetup {
             //     // TODO: fix async runtime error
             //     4.wait;
             // },
-        );
+	// );
 
         // tell which scripts to run after boot
         server.doWhenBooted({
@@ -191,7 +200,7 @@ PlonkSetup {
         this.server.sync;
     }
     startServer {
-        server.boot;        
+        server.boot;
     }
 
     at {|selector|
@@ -205,7 +214,7 @@ PlonkSetup {
     //     ^dict.perform(selector, *args);
     // }
     pr_runList {|list, asyncProtect = false|
-        // evaluate a list of files or functions. 
+        // evaluate a list of files or functions.
         // if asyncProtect is true, the evaluation is wrapped in a Task
         // complains, if a file is not found
 
